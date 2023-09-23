@@ -10,10 +10,10 @@ app.use(bodyParser.urlencoded({extended:true}));
 app.use(express.json());
 
 const users=[
-    {"email":"2334","username":"bob","id":22,"password":"123345","isadmin":false},
-    {"email":"555","username":"ena","id":2,"password":"555","isadmin":true},
-    {"email":"6666","username":"cam","id":52,"password":"54551","isadmin":true},
-    {"email":"55558","username":"err","id":2992,"password":"5558","isadmin":true},
+    {"email":"2334","username":"bob","id":"22","password":"123345","isadmin":false},
+    {"email":"555","username":"ena","id":"2","password":"555","isadmin":true},
+    {"email":"6666","username":"cam","id":"52","password":"54551","isadmin":true},
+    {"email":"55558","username":"err","id":"2992","password":"5558","isadmin":true},
 
 ]
 
@@ -48,7 +48,7 @@ app.post("/api/refresh",(req,res)=>{
 })
 
 const genarateAccesToken = (user)=>{
-return jwt.sign({id:user.id,isadmin:user.isadmin},"mySecretKey",{expiresIn:"5m"}); 
+return jwt.sign({id:user.id,isadmin:user.isadmin},"mySecretKey",{expiresIn:"20s"}); 
 }
 
 const genarateRefreshToken = (user)=>{
@@ -74,7 +74,8 @@ res.json({
     username:user.username,
     isadmin:user.isadmin,
     accesToken:accesToken,
-    refreshToken:refreshToken
+    refreshToken:refreshToken,
+    id:user.id
     
 
 })
@@ -94,7 +95,7 @@ const verify=(req,res,next)=>{
                 res.status(403).json("Token is not valid")
             }else{
                 console.log(user)
-                console.log("Delete token "+token)
+                // console.log("Delete token "+token)
 
                 req.user=user;
                 next();
@@ -107,7 +108,11 @@ const verify=(req,res,next)=>{
 }
 
 app.delete('/api/users/:userId',verify,(req,res)=>{
+    console.log(req.user.id )
+    console.log(req.params.userId)
+
     if(req.user.id === req.params.userId || req.user.isadmin){
+
         res.status(200).json("User has been deleted");
     }else{
         res.status(403).json("You are no allowed to delete user");
